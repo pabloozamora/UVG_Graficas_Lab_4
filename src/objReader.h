@@ -83,7 +83,7 @@ std::vector<Vertex> setupVertexArray(const std::vector<glm::vec3>& vertices, std
             glm::vec3 vertexNormal = normals[face.normalIndices[i]];
 
             // Add the vertex position and normal to the vertex array
-            vertexArray.push_back(Vertex{vertexPosition, vertexNormal});
+            vertexArray.push_back(Vertex{vertexPosition, vertexNormal, vertexPosition});
         }
 
     }

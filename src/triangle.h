@@ -2,11 +2,9 @@
 #include <vector>
 #include "fragment.h"
 #include "line.h"
+#include "globals.h"
 
 #pragma once
-
-const int SCREEN_WIDTH = 1300;
-const int SCREEN_HEIGHT = 800;
 
 glm::vec3 L = glm::vec3(0.0f, 0.0f, 1.0f);
 
@@ -66,12 +64,15 @@ std::vector<Fragment> triangle(const Vertex& a, const Vertex& b, const Vertex& c
       if (intensity < 0)
         continue;
 
+      glm::vec3 originalPos = a.originalPos * w + b.originalPos * v + c.originalPos * u;
+
       fragments.push_back(
         Fragment{
           glm::vec3(static_cast<uint16_t>(P.x), static_cast<uint16_t>(P.y), 0),
           Color(205, 205, 205), //color blanco hardcodeado
           z,
-          intensity}
+          intensity,
+          originalPos}
       );
     }
 }

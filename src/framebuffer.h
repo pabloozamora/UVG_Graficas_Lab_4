@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include "fragment.h"
 
-void clear();
+void clear(int ox, int oy);
 
 void point(const Fragment&);
 

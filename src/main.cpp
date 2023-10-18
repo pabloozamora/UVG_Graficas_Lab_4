@@ -39,7 +39,7 @@ bool init() {
         return false;
     }
 
-    window = SDL_CreateWindow("SR 2: Flat Shading", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Lab 4: Shaders", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window) {
         std::cerr << "Error: No se pudo crear una ventana SDL: " << SDL_GetError() << std::endl;
         return false;
@@ -156,7 +156,7 @@ int main(int argv, char** args)
         return 1;
     }
 
-    clear();
+    clear(100, 100);
 
     loadOBJ(modelPath, vertices, normals, faces);
     verticesArray = setupVertexArray(vertices, normals, faces);
@@ -170,7 +170,7 @@ int main(int argv, char** args)
 
     // Inicializar cámara
     Camera camera;
-    camera.cameraPosition = glm::vec3(0.0f, 0.0f, 2.0f);
+    camera.cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
     camera.targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     camera.upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -184,6 +184,7 @@ int main(int argv, char** args)
 
     bool isRunning = true;
     while (isRunning) {
+        frame += 1;
         SDL_Event event;
         while (SDL_PollEvent(&event) != 0) {
             if (event.type == SDL_QUIT) {
@@ -191,7 +192,7 @@ int main(int argv, char** args)
             }
         }
 
-        rotationAngle += 2.0;
+        rotationAngle += 1.0;
         glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngle), rotationAxis);
 
         // Calcular la matriz de modelo
@@ -204,7 +205,7 @@ int main(int argv, char** args)
             camera.upVector        // The up vector defining the camera's orientation
         );
 
-        clear();
+        clear(100, 100);
 
         render(Primitive::TRIANGLES);
 

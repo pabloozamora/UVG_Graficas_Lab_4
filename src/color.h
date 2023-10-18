@@ -1,72 +1,50 @@
 #pragma once
+#include <SDL.h>
+#include <algorithm>
 #include <iostream>
 
-class Color {
-private:
-    uint8_t r;  // componente roja
-    uint8_t g;  // componente verde
-    uint8_t b;  // componente azul
+struct Color {
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+    Uint8 a;
 
-public:
-    Color(){}
-    // Constructor
-    Color(int blue, int green, int red) {
-        // Asegurarse de que los valores estén en el rango correcto utilizando clamping
-        r = (red < 0) ? 0 : ((red > 255) ? 255 : red);
-        g = (green < 0) ? 0 : ((green > 255) ? 255 : green);
-        b = (blue < 0) ? 0 : ((blue > 255) ? 255 : blue);
+    Color() : r(0), g(0), b(0), a(255) {}
+
+    Color(int red, int green, int blue, int alpha = 255) {
+        r = static_cast<Uint8>(std::min(std::max(red, 0), 255));
+        g = static_cast<Uint8>(std::min(std::max(green, 0), 255));
+        b = static_cast<Uint8>(std::min(std::max(blue, 0), 255));
+        a = static_cast<Uint8>(std::min(std::max(alpha, 0), 255));
     }
 
-    // Método para imprimir el color
-    friend std::ostream& operator<<(std::ostream& os, const Color& color) {
-        os << "RGB(" << color.r << ", " << color.g << ", " << color.b << ")";
-        return os;
+    Color(float red, float green, float blue, float alpha = 1.0f) {
+        r = static_cast<Uint8>(std::min(std::max(red * 255, 0.0f), 255.0f));
+        g = static_cast<Uint8>(std::min(std::max(green * 255, 0.0f), 255.0f));
+        b = static_cast<Uint8>(std::min(std::max(blue * 255, 0.0f), 255.0f));
+        a = static_cast<Uint8>(std::min(std::max(alpha * 255, 0.0f), 255.0f));
     }
 
-    const int getRed() {
-        return r;
-    }
-
-    const int getGreen() {
-        return g;
-    }
-
-    const int getBlue() {
-        return b;
-    }
-
-    // Sobrecarga del operador de suma para sumar dos colores
+    // Overload the + operator to add colors
     Color operator+(const Color& other) const {
-        int newR = r + other.r;
-        int newG = g + other.g;
-        int newB = b + other.b;
-
-        // Asegurarse de que los valores no excedan 255
-        newR = (newR > 255) ? 255 : newR;
-        newG = (newG > 255) ? 255 : newG;
-        newB = (newB > 255) ? 255 : newB;
-
-        return Color(newR, newG, newB);
+        return Color(
+            std::min(255, int(r) + int(other.r)),
+            std::min(255, int(g) + int(other.g)),
+            std::min(255, int(b) + int(other.b)),
+            std::min(255, int(a) + int(other.a))
+        );
     }
 
-    // Sobrecarga del operador de multiplicación para multiplicar el color por un float
-    Color operator*(float value) const {
-        int newR = static_cast<int>(r * value);
-        int newG = static_cast<int>(g * value);
-        int newB = static_cast<int>(b * value);
-
-        // Asegurarse de que los valores no excedan 255
-        newR = (newR > 255) ? 255 : newR;
-        newG = (newG > 255) ? 255 : newG;
-        newB = (newB > 255) ? 255 : newB;
-
-        return Color(newR, newG, newB);
+    // Overload the * operator to scale colors by a factor
+    Color operator*(float factor) const {
+        return Color(
+            std::clamp(static_cast<Uint8>(r * factor), Uint8(0), Uint8(255)),
+            std::clamp(static_cast<Uint8>(g * factor), Uint8(0), Uint8(255)),
+            std::clamp(static_cast<Uint8>(b * factor), Uint8(0), Uint8(255)),
+            std::clamp(static_cast<Uint8>(a * factor), Uint8(0), Uint8(255))
+        );
     }
 
-    bool operator==(const Color &color)
-    {
-        if (r == color.r && b == color.b && g == color.g)
-            return true;
-        return false;
-    }
+    // Friend function to allow float * Color
+    friend Color operator*(float factor, const Color& color);
 };
