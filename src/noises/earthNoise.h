@@ -30,10 +30,7 @@ Color getEarthNoise(float x, float y, float z){
 
     skyNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     skyNoise.SetFractalType(FastNoiseLite::FractalType_FBm);
-    //skyNoise.SetFrequency(0.002);
-    float animationSpeed = 0.01f; // Adjust the speed of the animation
-    //float time = frame * animationSpeed;
-    //skyNoise.SetFrequency(0.02 + (sin(time)) * 0.01);
+    float animationSpeed = 0.01f;
     skyNoise.SetFractalOctaves(6);
 
     

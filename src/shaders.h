@@ -6,6 +6,9 @@
 #include "./noises/earthNoise.h"
 #include "./noises/sunNoise.h"
 #include "./noises/slimePlanetNoise.h"
+#include "./noises/diamondPlanetNoise.h"
+#include "./noises/gasPlanetNoise.h"
+#include "./noises/moonNoise.h"
 
 Vertex vertexShader(const Vertex& vertex, const Uniforms& uniforms) {
     // Aplicar las transformaciones al vértice utilizando las matrices de uniforms
@@ -34,7 +37,7 @@ Fragment fragmentShader(Fragment& fragment) {
     float y = fragment.originalPos.y;
     float z = fragment.originalPos.z;
 
-    fragment.color = getEarthNoise(x,y,z) * fragment.intensity;
+    fragment.color = getMoonNoise(x,y,z) * fragment.intensity;
 
     return fragment;
 }
