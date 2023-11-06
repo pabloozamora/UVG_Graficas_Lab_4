@@ -9,6 +9,8 @@
 #include "shaders.h"
 #include "triangle.h"
 #include "camera.h"
+#include "planet.h"
+#include <string>
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -22,6 +24,8 @@ std::vector<glm::vec3> vertices;
 std::vector<glm::vec3> normals;
 std::vector<Face> faces;
 std::vector<Vertex> verticesArray;
+std::vector<Planet> models;
+std::vector<std::vector<Vertex>> modelsVertices;
 
 Uniforms uniforms;
 
@@ -123,10 +127,7 @@ glm::mat4 createViewportMatrix(size_t screenWidth, size_t screenHeight) {
     return viewport;
 }
 
-void render(Primitive polygon){
-
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+void render(Primitive polygon, std::string name){
 
     // 1. Vertex Shader
     std::vector<Vertex> transformedVertices;
@@ -144,9 +145,35 @@ void render(Primitive polygon){
     // 4. Fragment Shader
     for (Fragment& fragment : fragments) {
     // Apply the fragment shader to compute the final color
-    fragment = fragmentShader(fragment);
+    fragment = fragmentShader(fragment, name);
     point(fragment);
     }
+
+}
+
+std::string getCurrentPlanet(int& planetIndex) {
+    // Definir orden de los planetas
+    if (planetIndex == 0) {
+        return "sun";
+    }
+
+    else if (planetIndex == 1) {
+        return "earth";
+    }
+
+    else if (planetIndex == 2) {
+        return "gas";
+    }
+
+    else if (planetIndex == 3) {
+        return "diamond";
+    }
+
+    else if (planetIndex == 4) {
+        return "slime";
+    }
+
+     return "sun";
 
 }
 
@@ -158,15 +185,7 @@ int main(int argv, char** args)
 
     clear(100, 100);
 
-    loadOBJ(modelPath, vertices, normals, faces);
-    verticesArray = setupVertexArray(vertices, normals, faces);
-
-    glm::vec3 translationVector(0.0f, 0.0f, 0.0f);
-    glm::vec3 rotationAxis(0.0f, 1.0f, 0.0f); // Rotar alrededor del eje Y
-    glm::vec3 scaleFactor(1.0f, 1.0f, 1.0f);
-
-    glm::mat4 translation = glm::translate(glm::mat4(1.0f), translationVector);
-    glm::mat4 scale = glm::scale(glm::mat4(1.0f), scaleFactor);
+    int planetIndex = 0;
 
     // Inicializar cámara
     Camera camera;
@@ -177,8 +196,33 @@ int main(int argv, char** args)
     // Matriz de proyección
     uniforms.projection = createProjectionMatrix();
 
-    //Matriz de viewport
+    // Matriz de viewport
     uniforms.viewport = createViewportMatrix(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    /*PREPARAR UNIFORMS*/
+
+    glm::vec3 rotationAxis(0.0f, 1.0f, 0.0f); // Rotar alrededor del eje Y
+
+    // Preparar uniforms del planeta
+    Planet planet;
+    planet.name = "sun";
+    planet.translationVector = {0.0f, 0.0f, 0.0f};
+    planet.rotationAngle = 1.0;
+    planet.scaleFactor = {1.0f, 1.0f, 1.0f};
+    models.push_back(planet);
+    
+    // Preparar uniforms de la luna
+    Planet moon;
+    moon.name = "moon";
+    moon.translationVector = {1.0f, 0.3f, 0.0f};
+    moon.rotationAngle = 1.0;
+    moon.scaleFactor = {0.2f, 0.2f, 0.2f};
+
+    for (Planet planet : models) {
+        loadOBJ(modelPath, vertices, normals, faces);
+        verticesArray = setupVertexArray(vertices, normals, faces);
+        modelsVertices.push_back(verticesArray);
+    };
 
     //Matriz de vista
 
@@ -190,29 +234,74 @@ int main(int argv, char** args)
             if (event.type == SDL_QUIT) {
                 isRunning = false;
             }
+
+            else if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+                    case SDLK_RIGHT:
+                        if (planetIndex < 4) {
+                            planetIndex++;
+                            if (planetIndex == 2) models.pop_back();
+                            models.pop_back();
+                            planet.name = getCurrentPlanet(planetIndex);
+                            models.push_back(planet);
+                            if (planetIndex == 1) models.push_back(moon);
+                        }
+                        break;
+
+                    case SDLK_LEFT:
+                        if (planetIndex > 0) {
+                            planetIndex--;
+                            if (planetIndex == 0) models.pop_back();
+                            models.pop_back();
+                            planet.name = getCurrentPlanet(planetIndex);
+                            models.push_back(planet);
+                            if (planetIndex == 1) models.push_back(moon);
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
         }
 
-        rotationAngle += 1.0;
-        glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngle), rotationAxis);
-
-        // Calcular la matriz de modelo
-        uniforms.model = translation * rotation * scale;
-
-        // Crear la matriz de vista usando el objeto cámara
-        uniforms.view = glm::lookAt(
-            camera.cameraPosition, // The position of the camera
-            camera.targetPosition, // The point the camera is looking at
-            camera.upVector        // The up vector defining the camera's orientation
-        );
-
         clear(100, 100);
-
-        render(Primitive::TRIANGLES);
-
-        renderBuffer(renderer);
-        SDL_RenderPresent(renderer);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
         SDL_Delay(1);
+
+        // Crear la matriz de vista usando el objeto cámara
+            uniforms.view = glm::lookAt(
+                camera.cameraPosition, // The position of the camera
+                camera.targetPosition, // The point the camera is looking at
+                camera.upVector        // The up vector defining the camera's orientation
+            );
+
+       
+        for (Planet model : models) {
+
+            if (model.name == "moon") {
+            model.translationVector.x = 1.0f * cos(glm::radians(rotationAngle));
+            model.translationVector.z = 1.0f * sin(glm::radians(rotationAngle));
+            }
+
+            rotationAngle += model.rotationAngle;
+            glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngle), rotationAxis);
+
+            glm::mat4 translation = glm::translate(glm::mat4(1.0f), model.translationVector);
+            glm::mat4 scale = glm::scale(glm::mat4(1.0f), model.scaleFactor);
+
+            // Calcular la matriz de modelo
+            uniforms.model = translation * rotation * scale;
+
+            render(Primitive::TRIANGLES, model.name);
+
+            renderBuffer(renderer);
+
+        }
+
+        SDL_RenderPresent(renderer);
 
     }
 

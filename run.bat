@@ -1,3 +1,3 @@
 call configure.bat
 call build.bat
-call SR2.exe
+call LAB_4.exe

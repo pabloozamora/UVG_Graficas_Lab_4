@@ -2,6 +2,7 @@
 #include "uniforms.h"
 #include "fragment.h"
 #include <SDL.h>
+#include <string>
 #include "FastNoiseLite.h"
 #include "./noises/earthNoise.h"
 #include "./noises/sunNoise.h"
@@ -31,31 +32,37 @@ Vertex vertexShader(const Vertex& vertex, const Uniforms& uniforms) {
     };
 }
 
-Fragment fragmentShader(Fragment& fragment) {
+Fragment fragmentShader(Fragment& fragment, const std::string name) {
 
     float x = fragment.originalPos.x;
     float y = fragment.originalPos.y;
     float z = fragment.originalPos.z;
 
-    fragment.color = getMoonNoise(x,y,z) * fragment.intensity;
+    if (name == "earth") {
+        
+        fragment.color = getEarthNoise(x,y,z) * fragment.intensity;
+    }
+
+    else if (name == "moon") {
+
+        fragment.color = getMoonNoise(x,y,z) * fragment.intensity;
+    }
+
+    else if (name == "sun") {
+        fragment.color = getSunNoise(x,y,z);
+    }
+
+    else if (name == "diamond") {
+        fragment.color = getDiamondPlanetNoise(x,y,z) * fragment.intensity;
+    }
+
+    else if (name == "slime") {
+        fragment.color = getSlimePlanetNoise(x,y,z) * fragment.intensity;
+    }
+
+    else if (name == "gas") {
+        fragment.color = getGasPlanetNoise(x,y,z) * fragment.intensity;
+    }
 
     return fragment;
 }
-
-//Planeta gaseoso
-/* Fragment fragmentShader(Fragment& fragment) {
-
-    Color color;
-
-    glm::vec3 baseColor = glm::vec3(0, 119, 182);
-
-    float stripePattern = glm::abs(glm::cos(fragment.originalPos.y * 30.0f) * 50.0f);
-
-    glm::vec3 tmpColor = baseColor + stripePattern;
-
-    color = Color(static_cast<int>(tmpColor.x), static_cast<int>(tmpColor.y), static_cast<int>(tmpColor.z));
-    
-    fragment.color = color * fragment.intensity;
-
-    return fragment;
-} */

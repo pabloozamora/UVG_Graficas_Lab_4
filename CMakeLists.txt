@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(SR2 VERSION 1.0)
+project(LAB_4 VERSION 1.0)
 
 # Enable C++20 features
 set(CMAKE_CXX_STANDARD 20)
