@@ -173,6 +173,14 @@ std::string getCurrentPlanet(int& planetIndex) {
         return "slime";
     }
 
+    else if (planetIndex == 5) {
+        return "mars";
+    }
+
+    else if (planetIndex == 6) {
+        return "mercury";
+    }
+
      return "sun";
 
 }
@@ -238,7 +246,7 @@ int main(int argv, char** args)
             else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_RIGHT:
-                        if (planetIndex < 4) {
+                        if (planetIndex < 6) {
                             planetIndex++;
                             if (planetIndex == 2) models.pop_back();
                             models.pop_back();
