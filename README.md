@@ -1,9 +1,8 @@
 # UVG_Graficas_Lab_4
-Universidad del Valle de Guatemala - Gráficas por computadora - Lab 4
-Universidad del Valle de Guatemala
-Gráficas por computadora
-Lab 4: Shaders
-**Pablo Andrés Zamora Vásquez**
+Universidad del Valle de Guatemala<br>
+Gráficas por computadora<br>
+Lab 4: Shaders<br>
+**Pablo Andrés Zamora Vásquez**<br>
 **Carné 21780**
 
 **Instrucciones:** Usar las flechas izquierda y derecha del teclado para visualizar los diferentes planetas
